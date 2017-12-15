@@ -17,6 +17,10 @@ def getType(tree):
         return("int")
     elif(tree == True or tree == False):
         return("bool")
+    elif isinstance(tree, ast.BoolOp):
+        return("bool")
+    elif isinstance(tree, ast.UnaryOp):
+        return("bool")
     elif isinstance(tree, ast.NameConstant):
         return(getType(tree.value))
     elif isinstance(tree, ast.BinOp):
@@ -31,17 +35,19 @@ def getType(tree):
 #Depending on the datatype, translate returns a string corresponding to each node
 def translate(tree):
     stringTrans = ""
+
+    #variables
     if isinstance(tree, ast.Assign):
         varType = getType(tree.value)
         setType(tree.targets[0].id, varType)
         stringTrans += varType + " " + translate(tree.targets[0]) + " = " + translate(tree.value)
         return(stringTrans)
-    elif isinstance(tree, ast.Num):
-        return(str(tree.n))
-    elif isinstance(tree, ast.NameConstant):#boolean
-        return(str(tree.value).lower())
     elif isinstance(tree, ast.Name):
         return(tree.id)
+
+    #Integers
+    elif isinstance(tree, ast.Num):
+        return(str(tree.n))
     elif isinstance(tree, ast.BinOp):
         stringTrans += translate(tree.left) + translate(tree.op) + translate(tree.right)
         return stringTrans
@@ -58,6 +64,22 @@ def translate(tree):
     #TODO: still need these operators
     #elif isinstance(tree, ast.FloorDiv) "//"
     #elif isinstance(tree, ast.Pow) "**"
+
+    #Booleans
+    elif isinstance(tree, ast.NameConstant):
+        return(str(tree.value).lower())
+    elif isinstance(tree, ast.BoolOp):
+        stringTrans += translate(tree.values[0]) + translate(tree.op) + translate(tree.values[1])
+        return(stringTrans)
+    elif isinstance(tree, ast.UnaryOp):
+        stringTrans += translate(tree.op) + translate(tree.operand)
+        return(stringTrans)
+    elif isinstance(tree, ast.And):
+        return(" && ")
+    elif isinstance(tree, ast.Or):
+        return(" || ")
+    elif isinstance(tree, ast.Not):
+        return("!")
     else:
         return stringTrans
 
