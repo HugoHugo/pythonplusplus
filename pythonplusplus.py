@@ -15,6 +15,10 @@ def setType(var, varType):
 def getType(tree):
     if isinstance(tree, ast.Num):
         return("int")
+    elif(tree == True or tree == False):
+        return("bool")
+    elif isinstance(tree, ast.NameConstant):
+        return(getType(tree.value))
     elif isinstance(tree, ast.BinOp):
         return(getType(tree.left))
     elif isinstance(tree, ast.Name):
@@ -34,6 +38,8 @@ def translate(tree):
         return(stringTrans)
     elif isinstance(tree, ast.Num):
         return(str(tree.n))
+    elif isinstance(tree, ast.NameConstant):#boolean
+        return(str(tree.value).lower())
     elif isinstance(tree, ast.Name):
         return(tree.id)
     elif isinstance(tree, ast.BinOp):
