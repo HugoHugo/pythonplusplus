@@ -63,7 +63,8 @@ def translate(tree):
         return(" / ")
     elif isinstance(tree, ast.Mod):
         return(" % ")
-    #TODO: still need these operators
+    #TODO: still need decimal numbers
+    #TODO: still need these operators:
     #elif isinstance(tree, ast.FloorDiv) "//"
     #elif isinstance(tree, ast.Pow) "**"
 
