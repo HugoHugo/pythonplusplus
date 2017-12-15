@@ -21,6 +21,8 @@ def getType(tree):
         return("bool")
     elif isinstance(tree, ast.UnaryOp):
         return("bool")
+    elif isinstance(tree, ast.Compare):
+        return("bool")
     elif isinstance(tree, ast.NameConstant):
         return(getType(tree.value))
     elif isinstance(tree, ast.BinOp):
@@ -74,12 +76,27 @@ def translate(tree):
     elif isinstance(tree, ast.UnaryOp):
         stringTrans += translate(tree.op) + translate(tree.operand)
         return(stringTrans)
+    elif isinstance(tree, ast.Compare):
+        stringTrans += translate(tree.left) + translate(tree.ops[0]) + translate(tree.comparators[0])
+        return(stringTrans)
     elif isinstance(tree, ast.And):
         return(" && ")
     elif isinstance(tree, ast.Or):
         return(" || ")
     elif isinstance(tree, ast.Not):
         return("!")
+    elif isinstance(tree, ast.Eq):
+        return(" == ")
+    elif isinstance(tree, ast.NotEq):
+        return(" != ")
+    elif isinstance(tree, ast.Gt):
+        return(" > ")
+    elif isinstance(tree, ast.Lt):
+        return(" < ")
+    elif isinstance(tree, ast.GtE):
+        return(" >= ")
+    elif isinstance(tree, ast.LtE):
+        return(" <= ")
     else:
         return stringTrans
 
