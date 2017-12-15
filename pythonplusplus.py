@@ -1,9 +1,12 @@
 import ast
 
+#Global variables
 
 #Sturcture to store the datatypes for variables since the AST does not do this
 #may not be an appropriate solution when we start working on functions
 varTypeStore = {}
+#used for indentation for structures such as if, for, while, and functions
+indentationLevel = 0
 
 #Set datatype of variable
 def setType(var, varType):
@@ -102,15 +105,27 @@ def translate(tree):
     #if statements
     elif isinstance(tree, ast.If):
         stringTrans += "if(" + translate(tree.test) + "){\n"
-        stringTrans += translateCodeBlock(tree.body)
-        return(stringTrans)
+        stringTrans += translateCodeBlock(tree.body) + "\t"*indentationLevel + "}"
+        stringTrans += translateElseIf(tree.orelse)
+        return stringTrans
 
-    else:
+
+def translateElseIf(tree):
+    stringTrans = ""
+    if(not tree): #if there is not else or elif
+        return stringTrans
+    elif(isinstance(tree[0], ast.If)): #if there is an elif
+        stringTrans += "else if(" + translate(tree[0].test) + "){\n"
+        stringTrans += translateCodeBlock(tree[0].body) + "\t"*indentationLevel + "}"
+        stringTrans += translateElseIf(tree[0].orelse)
+        return stringTrans
+    else: #if there is an else
+        stringTrans += "else{\n"
+        stringTrans += translateCodeBlock(tree) + "\t"*indentationLevel + "}"
         return stringTrans
 
 
 #Breaks down code block into lines and translates each line separately
-indentationLevel = 0
 def translateCodeBlock(tree):
     transString = ""
     global indentationLevel
@@ -118,7 +133,7 @@ def translateCodeBlock(tree):
     for i in tree:
         transString += "\t"*indentationLevel + translate(i)
         if isinstance(i, ast.If):
-            transString += "\t"*indentationLevel + "}\n"
+            transString += "\n"
         else:
             transString += ";\n"
     indentationLevel -= 1
