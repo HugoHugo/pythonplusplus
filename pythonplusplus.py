@@ -43,8 +43,10 @@ def translate(tree):
 
     #variables
     if isinstance(tree, ast.Assign):
-        varType = getType(tree.value)
-        setType(tree.targets[0].id, varType)
+        varType = ""
+        if(tree.targets[0].id not in varTypeStore.keys()):
+            varType = getType(tree.value)
+            setType(tree.targets[0].id, varType)
         stringTrans += varType + " " + translate(tree.targets[0]) + " = " + translate(tree.value)
         return(stringTrans)
     elif isinstance(tree, ast.Name):
