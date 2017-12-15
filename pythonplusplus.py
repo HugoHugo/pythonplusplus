@@ -98,15 +98,31 @@ def translate(tree):
         return(" >= ")
     elif isinstance(tree, ast.LtE):
         return(" <= ")
+
+    #if statements
+    elif isinstance(tree, ast.If):
+        stringTrans += "if(" + translate(tree.test) + "){\n"
+        stringTrans += translateCodeBlock(tree.body)
+        return(stringTrans)
+
     else:
         return stringTrans
 
 
 #Breaks down code block into lines and translates each line separately
+indentationLevel = 0
 def translateCodeBlock(tree):
-    for i in tree.body:
-        print( "\t" + translate(i) + ";")
-
+    transString = ""
+    global indentationLevel
+    indentationLevel += 1
+    for i in tree:
+        transString += "\t"*indentationLevel + translate(i)
+        if isinstance(i, ast.If):
+            transString += "\t"*indentationLevel + "}\n"
+        else:
+            transString += ";\n"
+    indentationLevel -= 1
+    return(transString)
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
@@ -116,7 +132,7 @@ tree = ast.parse(open("./examples/mockPy.py").read())
 print("#include <iostream>")
 print("using namespace std;")
 print("int main(){")
-translateCodeBlock(tree)
+print(translateCodeBlock(tree.body))
 print("\treturn 0;")
 print("}")
 
