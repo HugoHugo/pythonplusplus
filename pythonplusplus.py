@@ -44,7 +44,7 @@ def translate(tree):
     #variables
     if isinstance(tree, ast.Assign):
         varType = ""
-        if(tree.targets[0].id not in varTypeStore.keys()):
+        if(tree.targets[0].id not in varTypeStore.keys()): #if the variable's type is not yet tracked
             varType = getType(tree.value)
             setType(tree.targets[0].id, varType)
         stringTrans += varType + " " + translate(tree.targets[0]) + " = " + translate(tree.value)
