@@ -40,48 +40,47 @@ def getType(tree):
 #Depending on the datatype, translate returns a string corresponding to each node
 def translate(tree):
     stringTrans = ""
-    print(tree)
 
     if isinstance(tree, ast.While):
-        final = "while("
-        final = final + translate(tree.test)
-        final = final + ") {\n"
-        final = final + translateCodeBlock(tree.body)
-        final = final + "   }"
-        return final
+        stringTrans = "while("
+        stringTrans += translate(tree.test)
+        stringTrans += ") {\n"
+        stringTrans += translateCodeBlock(tree.body)
+        stringTrans += "\n"*indentationLevel + "}"
+        return stringTrans
 
 
-    if isinstance(tree, ast.For): #a 'for in range' type loop
+    if isinstance(tree, ast.For): #'for in range' type of loop
         if tree.iter.func.id == "range":
-            final = "for(int i ="
+            stringTrans = "for(int i ="
             v1 = translate(tree.iter.args[0])
             v2 = translate(tree.iter.args[1])
-            final = final + v1 + ";" + " i < " + v2 + "; ++i) {\n"
-            final = final + translateCodeBlock(tree.body)
-            final = final + "\n" + "    }"
-            return final
+            stringTrans += v1 + ";" + " i < " + v2 + "; ++i) {\n"
+            stringTrans += translateCodeBlock(tree.body)
+            stringTrans += "\n"*indentationLevel + "}"
+            return stringTrans
         return "Not defined"
 
     if isinstance(tree, ast.Try):
-        final = "try{ \n"
-        final = final + translateCodeBlock(tree.body)
-        final = final + "   \n      }"
+        stringTrans = "try{ \n"
+        stringTrans += translateCodeBlock(tree.body)
+        stringTrans += "   \n      }"
         if tree.handlers:
-            final = final +" catch(...){\n"
-            final = final + translateCodeBlock(tree.handlers)
-            return final
-        return final
+            stringTrans += " catch(...){\n"
+            stringTrans += translateCodeBlock(tree.handlers)
+            return stringTrans
+        return stringTrans
 
     if isinstance(tree, ast.Expr):
-        final = ""
-        final = final + translate(tree.value)
-        return final
+        stringTrans = ""
+        stringTrans += translate(tree.value)
+        return stringTrans
 
     if isinstance(tree, ast.ExceptHandler):
-        final = ""
-        final = final + translateCodeBlock(tree.body)
-        final = final + "    }"
-        return final
+        stringTrans = ""
+        stringTrans += translateCodeBlock(tree.body)
+        stringTrans += "\n"*indentationLevel + "}"
+        return stringTrans
     #variables
     if isinstance(tree, ast.Assign):
         varType = ""
@@ -197,15 +196,9 @@ tree = ast.parse(open("./examples/mockPyLoops.py").read())
 print("#include <iostream>")
 print("using namespace std;")
 print("int main(){")
-print(ast.dump(tree))
 print(translateCodeBlock(tree.body))
 print("\treturn 0;")
 print("}")
 
-#Module(body=[While(test=Compare(left=Num(n=1), ops=[Gt()], comparators=[Num(n=10)]), body=[Expr(value=Num(n=3))], orelse=[])])
-#obj = []
-#for t in dir(tree):
-#    if not t.startswith('__' and '_'):
-#        print("THIS IS: " + t)
 
 #write to output file
