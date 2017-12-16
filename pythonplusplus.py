@@ -40,16 +40,26 @@ def getType(tree):
 #Depending on the datatype, translate returns a string corresponding to each node
 def translate(tree):
     stringTrans = ""
-    print(tree)
+
     if isinstance(tree, ast.Try):
-        final = "try "
+        final = "try{ \n"
         final = final + translateCodeBlock(tree.body)
+        final = final + "   \n      }"
+        if tree.handlers:
+            final = final +" catch(...){\n"
+            final = final + translateCodeBlock(tree.handlers)
+            return final
         return final
 
     if isinstance(tree, ast.Expr):
         final = ""
         final = final + translate(tree.value)
-        final = final + translate(tree.handlers)
+        return final
+
+    if isinstance(tree, ast.ExceptHandler):
+        final = ""
+        final = final + translateCodeBlock(tree.body)
+        final = final + "    }"
         return final
 
     #variables
