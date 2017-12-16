@@ -45,9 +45,9 @@ def translate(tree):
     if isinstance(tree, ast.Assign):
         varType = ""
         if(tree.targets[0].id not in varTypeStore.keys()): #if the variable's type is not yet tracked
-            varType = getType(tree.value)
+            varType = getType(tree.value) + " "
             setType(tree.targets[0].id, varType)
-        stringTrans += varType + " " + translate(tree.targets[0]) + " = " + translate(tree.value)
+        stringTrans += varType + translate(tree.targets[0]) + " = " + translate(tree.value)
         return(stringTrans)
     elif isinstance(tree, ast.Name):
         return(tree.id)
@@ -77,10 +77,17 @@ def translate(tree):
     elif isinstance(tree, ast.NameConstant):
         return(str(tree.value).lower())
     elif isinstance(tree, ast.BoolOp):
+        if(isinstance(tree.op, ast.And) and (isinstance(tree.values[1], ast.BoolOp))):
+            if isinstance(tree.values[1].op, ast.Or):
+                stringTrans += translate(tree.values[0]) + translate(tree.op) + "(" + translate(tree.values[1]) + ")"
+                returng(stringTrans)
         stringTrans += translate(tree.values[0]) + translate(tree.op) + translate(tree.values[1])
         return(stringTrans)
     elif isinstance(tree, ast.UnaryOp):
-        stringTrans += translate(tree.op) + translate(tree.operand)
+        if isinstance (tree.operand, ast.NameConstant): #checking order of operations
+            stringTrans += translate(tree.op) + translate(tree.operand)
+        else:
+            stringTrans += translate(tree.op) + "(" + translate(tree.operand) + ")"
         return(stringTrans)
     elif isinstance(tree, ast.Compare):
         stringTrans += translate(tree.left) + translate(tree.ops[0]) + translate(tree.comparators[0])
