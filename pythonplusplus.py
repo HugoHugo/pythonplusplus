@@ -1,6 +1,6 @@
 import ast
 
-#Global variables   
+#Global variables
 
 #Sturcture to store the datatypes for variables since the AST does not do this
 #may not be an appropriate solution when we start working on functions
