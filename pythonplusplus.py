@@ -40,6 +40,17 @@ def getType(tree):
 #Depending on the datatype, translate returns a string corresponding to each node
 def translate(tree):
     stringTrans = ""
+    print(tree)
+    if isinstance(tree, ast.Try):
+        final = "try "
+        final = final + translateCodeBlock(tree.body)
+        return final
+
+    if isinstance(tree, ast.Expr):
+        final = ""
+        final = final + translate(tree.value)
+        final = final + translate(tree.handlers)
+        return final
 
     #variables
     if isinstance(tree, ast.Assign):
@@ -80,7 +91,7 @@ def translate(tree):
         if(isinstance(tree.op, ast.And) and (isinstance(tree.values[1], ast.BoolOp))):
             if isinstance(tree.values[1].op, ast.Or):
                 stringTrans += translate(tree.values[0]) + translate(tree.op) + "(" + translate(tree.values[1]) + ")"
-                returng(stringTrans)
+                return(stringTrans)
         stringTrans += translate(tree.values[0]) + translate(tree.op) + translate(tree.values[1])
         return(stringTrans)
     elif isinstance(tree, ast.UnaryOp):
@@ -150,7 +161,7 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPy.py").read())
+tree = ast.parse(open("./examples/mockPyExceptions.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
@@ -160,5 +171,10 @@ print(translateCodeBlock(tree.body))
 print("\treturn 0;")
 print("}")
 
+#Module(body=[Try(body=[Expr(value=BinOp(left=Num(n=2), op=Add(), right=Num(n=2)))], handlers=[ExceptHandler(type=None, name=None, body=[Expr(value=BinOp(left=Num(n=3), op=Add(), right=Num(n=3)))])], orelse=[], finalbody=[])])
+#obj = []
+#for t in dir(tree):
+#    if not t.startswith('__' and '_'):
+#        print("THIS IS: " + t)
 
 #write to output file
