@@ -48,8 +48,8 @@ def translate(tree):
 
     if isinstance(tree, ast.List):
         global arrayCounter
-        type = getType(tree.elts[0])
-        stringTrans += type + " defArray" + str(arrayCounter) + "[] = {"
+        Ltype = getType(tree.elts[0])
+        stringTrans += Ltype + " defArray" + str(arrayCounter) + "[] = {"
         arrayCounter += 1
 
         for i in range(0,len(tree.elts)):
