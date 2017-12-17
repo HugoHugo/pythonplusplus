@@ -100,7 +100,7 @@ def translate(tree):
     elif isinstance(tree, ast.Num):
         return(str(tree.n))
     elif isinstance(tree, ast.BinOp):
-        if(ast.dump(tree.op) == "BitXor()"):
+        if(ast.dump(tree.op) == "Pow()"):
             stringTrans += "pow(" + translate(tree.left) + translate(tree.op) + translate(tree.right) + ")"
             return stringTrans
         stringTrans += translate(tree.left) + translate(tree.op) + translate(tree.right)
@@ -115,7 +115,7 @@ def translate(tree):
         return(" / ")
     elif isinstance(tree, ast.Mod):
         return(" % ")
-    elif isinstance(tree, ast.BitXor):
+    elif isinstance(tree, ast.Pow):
         return(",")
     #TODO: still need decimal numbers
     #TODO: still need these operators:
