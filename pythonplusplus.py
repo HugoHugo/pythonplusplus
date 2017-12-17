@@ -104,12 +104,11 @@ def translate(tree):
                     stringTrans += translate(tree.value.args[a]) + ')'
 
             
-            #print ((tree.value.args[0].n) or (tree.value.args[0].s)) 
+
             return stringTrans
             
                 
-        #print (dir(tree.targets[0]))
-       # print (ast.dump(tree.targets[0]))
+
         if(isinstance(tree.targets[0], ast.Name)):
             
             for t in tree.targets:
@@ -192,10 +191,6 @@ def translate(tree):
             args.append(arg)
             arg_name.append(tree.args.args[a].arg)
         
-        print("#include <iostream>")
-        print("#include <string>")
-        print("#include <math.h>")
-        print("using namespace std;")
 
         funcName = tree.name
 
