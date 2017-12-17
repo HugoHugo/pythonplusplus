@@ -50,7 +50,13 @@ def translate(tree):
     global indentationLevel
     global loopStructureNum
     global arrayCounter
-    if isinstance(tree, ast.List):
+
+    if isinstance(tree, ast.AugAssign):
+        vIn = translate(tree.target)
+        stringTrans += vIn + " = " + vIn + translate(tree.op) + translate(tree.value)
+        return stringTrans
+
+    elif isinstance(tree, ast.List):
         Ltype = getType(tree.elts[0])
         stringTrans += Ltype + " defArray" + str(arrayCounter) + "[] = {"
         arrayCounter += 1
@@ -236,7 +242,7 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPy.py").read())
+tree = ast.parse(open("./examples/mockPyMissAssOp.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
