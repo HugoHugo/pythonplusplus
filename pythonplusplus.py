@@ -2,6 +2,7 @@ import ast
 
 #Global variables
 
+arrayCounter=0
 #Sturcture to store the datatypes for variables since the AST does not do this
 #may not be an appropriate solution when we start working on functions
 varTypeStore = {}
@@ -45,7 +46,21 @@ def getType(tree):
 def translate(tree):
     stringTrans = ""
 
-    if isinstance(tree, ast.While):
+    if isinstance(tree, ast.List):
+        global arrayCounter
+        Ltype = getType(tree.elts[0])
+        stringTrans += Ltype + " defArray" + str(arrayCounter) + "[] = {"
+        arrayCounter += 1
+
+        for i in range(0,len(tree.elts)):
+            if(i== len(tree.elts)-1):
+                stringTrans += translate(tree.elts[i])
+                break
+            stringTrans += translate(tree.elts[i]) + ","
+        stringTrans += "}"
+        return stringTrans
+
+    elif isinstance(tree, ast.While):
         stringTrans = "while("
         stringTrans += translate(tree.test)
         stringTrans += ") {\n"
@@ -205,7 +220,7 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPyExponents.py").read())
+tree = ast.parse(open("./examples/mockPyLists.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
@@ -219,3 +234,4 @@ print("}")
 
 
 #write to output file
+#
