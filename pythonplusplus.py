@@ -52,10 +52,10 @@ def translate(tree):
 
     if isinstance(tree, ast.For): #'for in range' type of loop
         if tree.iter.func.id == "range":
-            stringTrans = "for(int i ="
+            stringTrans = "for(int " + tree.target.id + "="
             v1 = translate(tree.iter.args[0])
             v2 = translate(tree.iter.args[1])
-            stringTrans += v1 + ";" + " i < " + v2 + "; ++i) {\n"
+            stringTrans += v1 + "; " + tree.target.id + " < " + v2 + "; ++" + tree.target.id + ") {\n"
             stringTrans += translateCodeBlock(tree.body)
             stringTrans += "\n"*indentationLevel + "}"
             return stringTrans
