@@ -100,6 +100,9 @@ def translate(tree):
     elif isinstance(tree, ast.Num):
         return(str(tree.n))
     elif isinstance(tree, ast.BinOp):
+        if(isinstance(tree.op, ast.Pow)):
+            stringTrans += "pow(" + translate(tree.left) + translate(tree.op) + translate(tree.right) + ")"
+            return stringTrans
         stringTrans += translate(tree.left) + translate(tree.op) + translate(tree.right)
         return stringTrans
     elif isinstance(tree, ast.Add):
@@ -112,6 +115,8 @@ def translate(tree):
         return(" / ")
     elif isinstance(tree, ast.Mod):
         return(" % ")
+    elif isinstance(tree, ast.Pow):
+        return(",")
     #TODO: still need decimal numbers
     #TODO: still need these operators:
     #elif isinstance(tree, ast.FloorDiv) "//"
@@ -200,11 +205,12 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPyFloats.py").read())
+tree = ast.parse(open("./examples/mockPyExponents.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
 print("#include <string>")
+print("#include <math.h>")
 print("using namespace std;")
 print("int main(){")
 print(translateCodeBlock(tree.body))
