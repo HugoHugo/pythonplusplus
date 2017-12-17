@@ -20,6 +20,8 @@ def getType(tree):
         if type(tree.n) == type(0.234): #does not matter what number as long as float
             return("float")
         return("int")
+    if isinstance(tree, ast.Str):
+        return("string")
     elif(tree == True or tree == False):
         return("bool")
     elif isinstance(tree, ast.BoolOp):
@@ -115,6 +117,10 @@ def translate(tree):
     #elif isinstance(tree, ast.FloorDiv) "//"
     #elif isinstance(tree, ast.Pow) "**"
 
+    #strings
+    elif isinstance(tree, ast.Str):
+        return('"' + tree.s + '"')
+
     #Booleans
     elif isinstance(tree, ast.NameConstant):
         return(str(tree.value).lower())
@@ -196,6 +202,7 @@ tree = ast.parse(open("./examples/mockPyFloats.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
+print("#include <string>")
 print("using namespace std;")
 print("int main(){")
 print(translateCodeBlock(tree.body))
