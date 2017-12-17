@@ -2,12 +2,14 @@ import ast
 
 #Global variables
 
+
 #Sturcture to store the datatypes for variables since the AST does not do this
 #may not be an appropriate solution when we start working on functions
 varTypeStore = {}
 #used for indentation for structures such as if, for, while, and functions
 indentationLevel = 0
 loopStructureNum = 0
+arrayCounter=0
 
 #Set datatype of variable
 def setType(var, varType):
@@ -47,7 +49,21 @@ def translate(tree):
     stringTrans = ""
     global indentationLevel
     global loopStructureNum
-    if isinstance(tree, ast.While):
+    global arrayCounter
+    if isinstance(tree, ast.List):
+        Ltype = getType(tree.elts[0])
+        stringTrans += Ltype + " defArray" + str(arrayCounter) + "[] = {"
+        arrayCounter += 1
+
+        for i in range(0,len(tree.elts)):
+            if(i== len(tree.elts)-1):
+                stringTrans += translate(tree.elts[i])
+                break
+            stringTrans += translate(tree.elts[i]) + ","
+        stringTrans += "}"
+        return stringTrans
+
+    elif isinstance(tree, ast.While):
         stringTrans = "while("
         stringTrans += translate(tree.test)
         stringTrans += ") {\n"
@@ -234,3 +250,4 @@ print("}")
 
 
 #write to output file
+#
