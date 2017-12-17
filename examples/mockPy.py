@@ -1,1 +1,2 @@
-x="strings"
+for i in "string":
+    z = i
