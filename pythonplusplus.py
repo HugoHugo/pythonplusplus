@@ -2,12 +2,14 @@ import ast
 
 #Global variables
 
-arrayCounter=0
+
 #Sturcture to store the datatypes for variables since the AST does not do this
 #may not be an appropriate solution when we start working on functions
 varTypeStore = {}
 #used for indentation for structures such as if, for, while, and functions
 indentationLevel = 0
+loopStructureNum = 0
+arrayCounter=0
 
 #Set datatype of variable
 def setType(var, varType):
@@ -45,9 +47,10 @@ def getType(tree):
 #Depending on the datatype, translate returns a string corresponding to each node
 def translate(tree):
     stringTrans = ""
-
+    global indentationLevel
+    global loopStructureNum
+    global arrayCounter
     if isinstance(tree, ast.List):
-        global arrayCounter
         Ltype = getType(tree.elts[0])
         stringTrans += Ltype + " defArray" + str(arrayCounter) + "[] = {"
         arrayCounter += 1
@@ -65,19 +68,31 @@ def translate(tree):
         stringTrans += translate(tree.test)
         stringTrans += ") {\n"
         stringTrans += translateCodeBlock(tree.body)
-        stringTrans += "\n"*indentationLevel + "}"
+        stringTrans += "\t"*indentationLevel + "}"
         return stringTrans
 
 
-    elif isinstance(tree, ast.For): #'for in range' type of loop
-        if tree.iter.func.id == "range":
-            stringTrans = "for(int " + tree.target.id + "="
+    elif isinstance(tree, ast.For):
+        if isinstance(tree.iter, ast.Call):#'for var in range' type of loop
+            setType(tree.target.id, "int")
+            stringTrans = "for(int " + tree.target.id + " = "
             v1 = translate(tree.iter.args[0])
             v2 = translate(tree.iter.args[1])
-            stringTrans += v1 + "; " + tree.target.id + " < " + v2 + "; ++" + tree.target.id + ") {\n"
+            stringTrans += v1 + "; " + tree.target.id + " < " + v2 + "; ++" + tree.target.id + "){\n"
             stringTrans += translateCodeBlock(tree.body)
-            stringTrans += "\n"*indentationLevel + "}"
+            stringTrans += "\t"*indentationLevel + "}"
             return stringTrans
+        if isinstance(tree.iter, ast.Str):#'for var in string' type of loop
+            loopStructureNum += 1
+            setType(tree.target.id, "string")
+            stringTrans += "string loopStruct" + str(loopStructureNum) + " = " + '"' + tree.iter.s + '"' + ";"
+            stringTrans += "\n" + "\t"*indentationLevel
+            stringTrans += "for(int n = 0;  n < " + str(len(tree.iter.s)) + "; ++n){\n";
+            stringTrans += "\t"*(indentationLevel+1) + "string " + tree.target.id + " = " + "loopStruct" + str(loopStructureNum) + "[n]\n"
+            stringTrans += translateCodeBlock(tree.body)
+            stringTrans += "\t"*indentationLevel + "}"
+            return stringTrans
+
         return "Not defined"
 
     elif isinstance(tree, ast.Try):
@@ -104,8 +119,9 @@ def translate(tree):
     elif isinstance(tree, ast.Assign):
         varType = ""
         if(tree.targets[0].id not in varTypeStore.keys()): #if the variable's type is not yet tracked
-            varType = getType(tree.value) + " "
+            varType = getType(tree.value)
             setType(tree.targets[0].id, varType)
+            varType += " "
         stringTrans += varType + translate(tree.targets[0]) + " = " + translate(tree.value)
         return(stringTrans)
     elif isinstance(tree, ast.Name):
@@ -211,7 +227,7 @@ def translateCodeBlock(tree):
     indentationLevel += 1
     for i in tree:
         transString += "\t"*indentationLevel + translate(i)
-        if isinstance(i, ast.If):
+        if isinstance(i, ast.If) or isinstance(i, ast.For) or isinstance(i, ast.While):
             transString += "\n"
         else:
             transString += ";\n"
@@ -220,7 +236,7 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPyLists.py").read())
+tree = ast.parse(open("./examples/mockPy.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
