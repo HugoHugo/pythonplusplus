@@ -17,6 +17,8 @@ def setType(var, varType):
 #at this point, this function should only be used with the ast.Assign datatype
 def getType(tree):
     if isinstance(tree, ast.Num):
+        if type(tree.n) == type(0.234): #does not matter what number as long as float
+            return("float")
         return("int")
     elif(tree == True or tree == False):
         return("bool")
@@ -190,7 +192,7 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPyLoops.py").read())
+tree = ast.parse(open("./examples/mockPyFloats.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
