@@ -18,6 +18,8 @@ def setType(var, varType):
 def getType(tree):
     if isinstance(tree, ast.Num):
         return("int")
+    if isinstance(tree, ast.Str):
+        return("string")
     elif(tree == True or tree == False):
         return("bool")
     elif isinstance(tree, ast.BoolOp):
@@ -72,6 +74,10 @@ def translate(tree):
     #TODO: still need these operators:
     #elif isinstance(tree, ast.FloorDiv) "//"
     #elif isinstance(tree, ast.Pow) "**"
+
+    #strings
+    elif isinstance(tree, ast.Str):
+        return('"' + tree.s + '"')
 
     #Booleans
     elif isinstance(tree, ast.NameConstant):
