@@ -248,5 +248,3 @@ fT.write(translateCodeBlock(tree.body))
 fT.write("\treturn 0;\n")
 fT.write("}")
 fT.close()
-#write to output file
-#
