@@ -1,4 +1,4 @@
-import ast
+import ast,sys
 
 #Global variables
 
@@ -235,8 +235,11 @@ def translateCodeBlock(tree):
     return(transString)
 
 #Fetch python code and create ast
-#TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPy.py").read())
+try:
+    tree = ast.parse(open(sys.argv[1]).read())
+except:
+    print("Error in finding the given file. Format of input: python3 pythonplusplus.py FILENAME.py")
+    sys.exit()
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
