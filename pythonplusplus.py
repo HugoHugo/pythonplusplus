@@ -235,6 +235,3 @@ print("}")
 
 #write to output file
 #
-
-
-# print(ast.dump(tree))
