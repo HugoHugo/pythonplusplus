@@ -36,6 +36,11 @@ def getType(tree):
         return(getType(tree.left))
     elif isinstance(tree, ast.Name):
         return(varTypeStore[tree.id])
+
+    ##Functions here
+    elif isinstance(tree, ast.FunctionDef):
+        return 
+
     else:
         return("")
 
@@ -65,15 +70,15 @@ def translate(tree):
             return stringTrans
         return "Not defined"
 
-    elif isinstance(tree, ast.Try):
-        stringTrans = "try{ \n"
-        stringTrans += translateCodeBlock(tree.body)
-        stringTrans += "   \n      }"
-        if tree.handlers:
-            stringTrans += " catch(...){\n"
-            stringTrans += translateCodeBlock(tree.handlers)
-            return stringTrans
-        return stringTrans
+ #   elif isinstance(tree, ast.Try):
+  #      stringTrans = "try{ \n"
+   #     stringTrans += translateCodeBlock(tree.body)
+   #    stringTrans += "   \n      }"
+    #    if tree.handlers:
+     #       stringTrans += " catch(...){\n"
+      #      stringTrans += translateCodeBlock(tree.handlers)
+       #     return stringTrans
+       # return stringTrans
 
     elif isinstance(tree, ast.Expr):
         stringTrans = ""
@@ -87,12 +92,60 @@ def translate(tree):
         return stringTrans
     #variables
     elif isinstance(tree, ast.Assign):
+        
+
         varType = ""
-        if(tree.targets[0].id not in varTypeStore.keys()): #if the variable's type is not yet tracked
+        global args
+        if(isinstance(tree.value, ast.Call)):
+            
+            stringTrans += translate(tree.targets[0]) + " = " + translate(tree.value.func) + "("
+            for a in range(len(tree.value.args)):
+                if a < len(tree.value.args)-1:
+                    stringTrans += translate(tree.value.args[a]) + ', '
+                else:
+                    stringTrans += translate(tree.value.args[a]) + ')'
+
+            
+            #print ((tree.value.args[0].n) or (tree.value.args[0].s)) 
+            return stringTrans
+            
+                
+        #print (dir(tree.targets[0]))
+       # print (ast.dump(tree.targets[0]))
+        if(isinstance(tree.targets[0], ast.Name)):
+            
+            for t in tree.targets:
+
+                stringTrans += args[1] + "" + translate(t.id) + " " + translate(t) + " = " + translate(tree.value) 
+                return stringTrans
+            
+        
+        if(isinstance(tree.value, ast.Name)):
+
+                print(dir(tree.value))
+                
+                
+                stringTrans += args[1] + translate(tree.value.id)
+                return stringTrans
+
+
+
+
+        elif(tree.targets[0].id not in varTypeStore.keys()): #if the variable's type is not yet tracked
+
             varType = getType(tree.value) + " "
+
             setType(tree.targets[0].id, varType)
         stringTrans += varType + translate(tree.targets[0]) + " = " + translate(tree.value)
         return(stringTrans)
+
+    elif isinstance(tree, ast.Return):
+        vartype = ""
+        stringTrans += "return " + tree.value.id + ";"
+        return stringTrans
+        
+
+
     elif isinstance(tree, ast.Name):
         return(tree.id)
 
@@ -105,6 +158,7 @@ def translate(tree):
             return stringTrans
         stringTrans += translate(tree.left) + translate(tree.op) + translate(tree.right)
         return stringTrans
+
     elif isinstance(tree, ast.Add):
         return(" + ")
     elif isinstance(tree, ast.Sub):
@@ -121,6 +175,52 @@ def translate(tree):
     #TODO: still need these operators:
     #elif isinstance(tree, ast.FloorDiv) "//"
     #elif isinstance(tree, ast.Pow) "**"
+
+
+    #Functions
+    elif isinstance(tree, ast.FunctionDef):
+        
+
+        args = []
+        arg_name = []
+
+
+        ret_type = input("What is the return type of your function? ")
+        stringTrans += ret_type + " "
+
+        name = input("How many arguments do you have in your function? ")
+        for a in range(int(name)):
+            arg = input("What type of datatype is your " + str(a) + " argument? ")
+            args.append(arg)
+            arg_name.append(tree.args.args[a].arg)
+        
+        print("#include <iostream>")
+        print("#include <string>")
+        print("#include <math.h>")
+        print("using namespace std;")
+
+        funcName = tree.name
+
+
+        stringTrans += funcName + "("
+        for a in range(int(name)):
+            if (a != int(name)-1):
+                stringTrans += args[a] + " " + arg_name[a] + ", "
+            else:
+                stringTrans += args[a] + " " + arg_name[a] + "){\n        "
+
+
+        
+        for a in range(len(tree.body)-1):
+            stringTrans += translate(tree.body[a]) + '\n'
+        stringTrans += translate(tree.body[-1])
+        stringTrans += "}"
+
+
+
+        return stringTrans
+        
+
 
     #strings
     elif isinstance(tree, ast.Str):
@@ -205,9 +305,11 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPyExponents.py").read())
+tree = ast.parse(open("./examples/mockPyFunction.py").read())
 
 #TODO: Write to file instead of printing to stdout
+
+
 print("#include <iostream>")
 print("#include <string>")
 print("#include <math.h>")
