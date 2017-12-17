@@ -41,6 +41,46 @@ def getType(tree):
 def translate(tree):
     stringTrans = ""
 
+    if isinstance(tree, ast.While):
+        stringTrans = "while("
+        stringTrans += translate(tree.test)
+        stringTrans += ") {\n"
+        stringTrans += translateCodeBlock(tree.body)
+        stringTrans += "\n"*indentationLevel + "}"
+        return stringTrans
+
+
+    if isinstance(tree, ast.For): #'for in range' type of loop
+        if tree.iter.func.id == "range":
+            stringTrans = "for(int " + tree.target.id + "="
+            v1 = translate(tree.iter.args[0])
+            v2 = translate(tree.iter.args[1])
+            stringTrans += v1 + "; " + tree.target.id + " < " + v2 + "; ++" + tree.target.id + ") {\n"
+            stringTrans += translateCodeBlock(tree.body)
+            stringTrans += "\n"*indentationLevel + "}"
+            return stringTrans
+        return "Not defined"
+
+    if isinstance(tree, ast.Try):
+        stringTrans = "try{ \n"
+        stringTrans += translateCodeBlock(tree.body)
+        stringTrans += "   \n      }"
+        if tree.handlers:
+            stringTrans += " catch(...){\n"
+            stringTrans += translateCodeBlock(tree.handlers)
+            return stringTrans
+        return stringTrans
+
+    if isinstance(tree, ast.Expr):
+        stringTrans = ""
+        stringTrans += translate(tree.value)
+        return stringTrans
+
+    if isinstance(tree, ast.ExceptHandler):
+        stringTrans = ""
+        stringTrans += translateCodeBlock(tree.body)
+        stringTrans += "\n"*indentationLevel + "}"
+        return stringTrans
     #variables
     if isinstance(tree, ast.Assign):
         varType = ""
@@ -80,7 +120,7 @@ def translate(tree):
         if(isinstance(tree.op, ast.And) and (isinstance(tree.values[1], ast.BoolOp))):
             if isinstance(tree.values[1].op, ast.Or):
                 stringTrans += translate(tree.values[0]) + translate(tree.op) + "(" + translate(tree.values[1]) + ")"
-                returng(stringTrans)
+                return(stringTrans)
         stringTrans += translate(tree.values[0]) + translate(tree.op) + translate(tree.values[1])
         return(stringTrans)
     elif isinstance(tree, ast.UnaryOp):
@@ -150,7 +190,7 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPy.py").read())
+tree = ast.parse(open("./examples/mockPyLoops.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
