@@ -160,6 +160,7 @@ tree = ast.parse(open("./examples/mockPy.py").read())
 
 #TODO: Write to file instead of printing to stdout
 print("#include <iostream>")
+print("#include <string>")
 print("using namespace std;")
 print("int main(){")
 print(translateCodeBlock(tree.body))
