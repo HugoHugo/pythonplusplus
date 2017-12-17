@@ -100,7 +100,7 @@ def translate(tree):
     elif isinstance(tree, ast.Num):
         return(str(tree.n))
     elif isinstance(tree, ast.BinOp):
-        if(ast.dump(tree.op) == "Pow()"):
+        if(isinstance(tree.op, ast.Pow)):
             stringTrans += "pow(" + translate(tree.left) + translate(tree.op) + translate(tree.right) + ")"
             return stringTrans
         stringTrans += translate(tree.left) + translate(tree.op) + translate(tree.right)
