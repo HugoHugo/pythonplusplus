@@ -238,16 +238,15 @@ def translateCodeBlock(tree):
 #TODO: Allow user to choose file
 tree = ast.parse(open("./examples/mockPy.py").read())
 
-#TODO: Write to file instead of printing to stdout
-print("#include <iostream>")
-print("#include <string>")
-print("#include <math.h>")
-print("using namespace std;")
-print("int main(){")
-print(translateCodeBlock(tree.body))
-print("\treturn 0;")
-print("}")
-
-
+fT = open('finTranslation.cpp', 'w')
+fT.write("#include <iostream>\n")
+fT.write("#include <string>\n")
+fT.write("#include <math.h>\n")
+fT.write("using namespace std;\n\n")
+fT.write("int main(){\n")
+fT.write(translateCodeBlock(tree.body))
+fT.write("\treturn 0;\n")
+fT.write("}")
+fT.close()
 #write to output file
 #
