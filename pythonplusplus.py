@@ -20,7 +20,7 @@ def getType(tree):
         if type(tree.n) == type(0.234): #does not matter what number as long as float
             return("float")
         return("int")
-    if isinstance(tree, ast.Str):
+    elif isinstance(tree, ast.Str):
         return("string")
     elif(tree == True or tree == False):
         return("bool")
@@ -54,7 +54,7 @@ def translate(tree):
         return stringTrans
 
 
-    if isinstance(tree, ast.For): #'for in range' type of loop
+    elif isinstance(tree, ast.For): #'for in range' type of loop
         if tree.iter.func.id == "range":
             stringTrans = "for(int " + tree.target.id + "="
             v1 = translate(tree.iter.args[0])
@@ -65,7 +65,7 @@ def translate(tree):
             return stringTrans
         return "Not defined"
 
-    if isinstance(tree, ast.Try):
+    elif isinstance(tree, ast.Try):
         stringTrans = "try{ \n"
         stringTrans += translateCodeBlock(tree.body)
         stringTrans += "   \n      }"
@@ -75,18 +75,18 @@ def translate(tree):
             return stringTrans
         return stringTrans
 
-    if isinstance(tree, ast.Expr):
+    elif isinstance(tree, ast.Expr):
         stringTrans = ""
         stringTrans += translate(tree.value)
         return stringTrans
 
-    if isinstance(tree, ast.ExceptHandler):
+    elif isinstance(tree, ast.ExceptHandler):
         stringTrans = ""
         stringTrans += translateCodeBlock(tree.body)
         stringTrans += "\n"*indentationLevel + "}"
         return stringTrans
     #variables
-    if isinstance(tree, ast.Assign):
+    elif isinstance(tree, ast.Assign):
         varType = ""
         if(tree.targets[0].id not in varTypeStore.keys()): #if the variable's type is not yet tracked
             varType = getType(tree.value) + " "
@@ -164,6 +164,8 @@ def translate(tree):
         stringTrans += "if(" + translate(tree.test) + "){\n"
         stringTrans += translateCodeBlock(tree.body) + "\t"*indentationLevel + "}"
         stringTrans += translateElseIf(tree.orelse)
+        return stringTrans
+    else:
         return stringTrans
 
 
