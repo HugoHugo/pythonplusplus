@@ -37,9 +37,7 @@ def getType(tree):
     elif isinstance(tree, ast.Name):
         return(varTypeStore[tree.id])
 
-    ##Functions here
-    elif isinstance(tree, ast.FunctionDef):
-        return 
+     
 
     else:
         return("")
@@ -70,15 +68,15 @@ def translate(tree):
             return stringTrans
         return "Not defined"
 
- #   elif isinstance(tree, ast.Try):
-  #      stringTrans = "try{ \n"
-   #     stringTrans += translateCodeBlock(tree.body)
-   #    stringTrans += "   \n      }"
-    #    if tree.handlers:
-     #       stringTrans += " catch(...){\n"
-      #      stringTrans += translateCodeBlock(tree.handlers)
-       #     return stringTrans
-       # return stringTrans
+    elif isinstance(tree, ast.Try):
+        stringTrans = "try{ \n"
+        stringTrans += translateCodeBlock(tree.body)
+        stringTrans += "   \n      }"
+        if tree.handlers:
+            stringTrans += " catch(...){\n"
+            stringTrans += translateCodeBlock(tree.handlers)
+            return stringTrans
+        return stringTrans
 
     elif isinstance(tree, ast.Expr):
         stringTrans = ""
