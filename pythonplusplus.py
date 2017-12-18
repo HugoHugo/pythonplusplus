@@ -1,4 +1,4 @@
-import ast
+import ast,sys
 
 #Global variables
 
@@ -8,6 +8,7 @@ import ast
 varTypeStore = {}
 #used for indentation for structures such as if, for, while, and functions
 indentationLevel = 0
+#used for tracking loop structures
 loopStructureNum = 0
 arrayCounter=0
 
@@ -241,19 +242,24 @@ def translateCodeBlock(tree):
     return(transString)
 
 #Fetch python code and create ast
-#TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPyMissAssOp.py").read())
+try:
+    tree = ast.parse(open(sys.argv[1]).read())
+    finalTranslationFileName = sys.argv[1].split("/")[len(sys.argv[1].split("/")) - 1]
+    finalTranslationFileName = finalTranslationFileName.split(".")
+    finalTranslationFileName[len(finalTranslationFileName) - 1] = ".cpp"
+    finalTranslationFileName = "".join(finalTranslationFileName)
+except:
+    print("Error in finding the given file. Format of input: python3 pythonplusplus.py FILENAME.py")
+    sys.exit()
 
-#TODO: Write to file instead of printing to stdout
-print("#include <iostream>")
-print("#include <string>")
-print("#include <math.h>")
-print("using namespace std;")
-print("int main(){")
-print(translateCodeBlock(tree.body))
-print("\treturn 0;")
-print("}")
-
-
-#write to output file
-#
+fT = open(finalTranslationFileName, 'w')
+fT.write("#include <iostream>\n")
+fT.write("#include <string>\n")
+fT.write("#include <math.h>\n")
+fT.write("#include <fstream>\n")
+fT.write("using namespace std;\n\n")
+fT.write("int main(){\n")
+fT.write(translateCodeBlock(tree.body))
+fT.write("\treturn 0;\n")
+fT.write("}")
+fT.close()
