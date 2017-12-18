@@ -236,13 +236,18 @@ def translateCodeBlock(tree):
     return(transString)
 
 #Fetch python code and create ast
+
 try:
     tree = ast.parse(open(sys.argv[1]).read())
+    finalTranslationFileName = sys.argv[1].split("/")[len(sys.argv[1].split("/")) - 1]
+    finalTranslationFileName = finalTranslationFileName.split(".")
+    finalTranslationFileName[len(finalTranslationFileName) - 1] = ".cpp"
+    finalTranslationFileName = "".join(finalTranslationFileName)
 except:
     print("Error in finding the given file. Format of input: python3 pythonplusplus.py FILENAME.py")
     sys.exit()
 
-fT = open('finTranslation.cpp', 'w')
+fT = open(finalTranslationFileName, 'w')
 fT.write("#include <iostream>\n")
 fT.write("#include <string>\n")
 fT.write("#include <math.h>\n")
