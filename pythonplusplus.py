@@ -53,7 +53,7 @@ def translate(tree):
 
     if isinstance(tree, ast.AugAssign):
         vIn = translate(tree.target)
-        stringTrans += vIn + " = " + vIn + translate(tree.op) + translate(tree.value)
+        stringTrans += vIn + " " + translate(tree.op).split(" ")[1] + "= " + translate(tree.value)
         return stringTrans
 
     elif isinstance(tree, ast.List):
