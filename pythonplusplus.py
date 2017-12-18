@@ -239,6 +239,15 @@ def translate(tree):
         return stringTrans
 
     elif isinstance(tree, ast.Call):
+        if tree.func.id == "print":
+            stringTrans += "cout << "
+            for i in range(0, len(tree.args)):
+                stringTrans += translate(tree.args[i])
+                if i != len(tree.args) - 1:
+                    stringTrans += " << "
+            stringTrans += " << endl"
+            return stringTrans
+
         stringTrans += tree.func.id + "("
         for i in range(0, len(tree.args)):
             stringTrans += translate(tree.args[i])
@@ -305,3 +314,4 @@ fT.write(translatedCode)
 fT.write("\treturn 0;\n")
 fT.write("}")
 fT.close()
+print(ast.dump(tree))
