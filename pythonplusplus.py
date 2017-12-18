@@ -101,7 +101,7 @@ def translate(tree):
             stringTrans += "string loopStruct" + str(loopStructureNum) + " = " + '"' + tree.iter.s + '"' + ";"
             stringTrans += "\n" + "\t"*indentationLevel
             stringTrans += "for(int n = 0;  n < " + str(len(tree.iter.s)) + "; ++n){\n";
-            stringTrans += "\t"*(indentationLevel+1) + "string " + tree.target.id + " = " + "loopStruct" + str(loopStructureNum) + "[n]\n"
+            stringTrans += "\t"*(indentationLevel+1) + "string " + tree.target.id + "(1, loopStruct" + str(loopStructureNum) + "[n]);\n"
             stringTrans += translateCodeBlock(tree.body)
             stringTrans += "\t"*indentationLevel + "}"
             return stringTrans
@@ -248,7 +248,8 @@ def translate(tree):
         return(stringTrans)
 
     else:
-        return stringTrans
+        print("Error translating")
+        return("/*Error translating*/")
 
 
 def translateElseIf(tree): #helper function for if translations
