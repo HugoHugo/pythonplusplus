@@ -51,7 +51,13 @@ def translate(tree):
     global indentationLevel
     global loopStructureNum
     global arrayCounter
-    if isinstance(tree, ast.List):
+
+    if isinstance(tree, ast.AugAssign):
+        vIn = translate(tree.target)
+        stringTrans += vIn + " " + translate(tree.op).split(" ")[1] + "= " + translate(tree.value)
+        return stringTrans
+
+    elif isinstance(tree, ast.List):
         Ltype = getType(tree.elts[0])
         stringTrans += Ltype + " defArray" + str(arrayCounter) + "[] = {"
         arrayCounter += 1
@@ -236,7 +242,6 @@ def translateCodeBlock(tree):
     return(transString)
 
 #Fetch python code and create ast
-
 try:
     tree = ast.parse(open(sys.argv[1]).read())
     finalTranslationFileName = sys.argv[1].split("/")[len(sys.argv[1].split("/")) - 1]
