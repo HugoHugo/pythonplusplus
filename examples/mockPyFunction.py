@@ -1,7 +1,7 @@
-def ass(nums, alamo):
+def funcName(nums, alamo):
 	ret_val = nums
-	alamo = 5
-	return ret_val
+	newVal = alamo + 5
+	return ret_val + newVal
 
 y = "yo"
-x = ass(2, 1)
+x = funcName(2, 1)

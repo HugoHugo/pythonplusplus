@@ -237,7 +237,7 @@ def translateCodeBlock(tree):
 
 #Fetch python code and create ast
 #TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPy.py").read())
+tree = ast.parse(open("./examples/mockPyFunction.py").read())
 
 fT = open('finTranslation.cpp', 'w')
 fT.write("#include <iostream>\n")
