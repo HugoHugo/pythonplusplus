@@ -109,24 +109,22 @@ def translate(tree):
         return "Not defined"
 
     elif isinstance(tree, ast.Try):
-        stringTrans = "try{ \n"
+        stringTrans = "try{\n"
         stringTrans += translateCodeBlock(tree.body)
-        stringTrans += "   \n      }"
+        stringTrans += "\t"*indentationLevel + "}"
         if tree.handlers:
-            stringTrans += " catch(...){\n"
-            stringTrans += translateCodeBlock(tree.handlers)
+            stringTrans += "catch(...){\n"
+            stringTrans += translateCodeBlock(tree.handlers[0].body)
+            stringTrans += "\t"*indentationLevel + "}"
             return stringTrans
         return stringTrans
 
     elif isinstance(tree, ast.Expr):
-        stringTrans = ""
         stringTrans += translate(tree.value)
         return stringTrans
 
     elif isinstance(tree, ast.ExceptHandler):
-        stringTrans = ""
         stringTrans += translateCodeBlock(tree.body)
-        stringTrans += "\n"*indentationLevel + "}"
         return stringTrans
 
 
@@ -282,7 +280,7 @@ def translateCodeBlock(tree):
     global indentationLevel
     indentationLevel += 1
     for i in tree:
-        if isinstance(i, ast.If) or isinstance(i, ast.For) or isinstance(i, ast.While):
+        if isinstance(i, ast.If) or isinstance(i, ast.For) or isinstance(i, ast.While) or isinstance(i, ast.Try):
             transString += "\t"*indentationLevel + translate(i) + "\n"
         elif isinstance(i, ast.FunctionDef):
             transString += translate(i)
