@@ -11,6 +11,7 @@ indentationLevel = 0
 #used for tracking loop structures
 loopStructureNum = 0
 arrayCounter=0
+outMain = ""
 
 #Set datatype of variable
 def setType(var, varType):
@@ -40,6 +41,10 @@ def getType(tree):
         return(getType(tree.left))
     elif isinstance(tree, ast.Name):
         return(varTypeStore[tree.id])
+    elif isinstance(tree, ast.Return):
+        return(getType(tree.value))
+    elif isinstance(tree, ast.Call):
+        return(varTypeStore[tree.func.id])
     else:
         return("")
 
@@ -51,6 +56,7 @@ def translate(tree):
     global indentationLevel
     global loopStructureNum
     global arrayCounter
+    global outMain
 
     if isinstance(tree, ast.AugAssign):
         vIn = translate(tree.target)
@@ -122,6 +128,8 @@ def translate(tree):
         stringTrans += translateCodeBlock(tree.body)
         stringTrans += "\n"*indentationLevel + "}"
         return stringTrans
+
+
     #variables
     elif isinstance(tree, ast.Assign):
         varType = ""
@@ -208,11 +216,42 @@ def translate(tree):
         stringTrans += translateCodeBlock(tree.body) + "\t"*indentationLevel + "}"
         stringTrans += translateElseIf(tree.orelse)
         return stringTrans
+
+    #function statements
+    elif isinstance(tree, ast.FunctionDef):
+        stringTrans += tree.name + "("
+        for i in range(len(tree.args.args)):
+            datatype = input("Enter datatype for argument " + tree.args.args[i].arg + ":")
+            setType(tree.args.args[i].arg, datatype)
+            stringTrans += datatype + " " + tree.args.args[i].arg
+            if i != len(tree.args.args)-1:
+                stringTrans += ", "
+        stringTrans += "){\n"
+        stringTrans += translateCodeBlock(tree.body) + "}\n\n"
+        funcType = getType(tree.body[-1])
+        setType(tree.name, funcType)
+        stringTrans = funcType + " " + stringTrans
+        outMain += stringTrans
+        return ""
+
+    elif isinstance(tree, ast.Return):
+        stringTrans += "return(" + translate(tree.value) + ")"
+        return stringTrans
+
+    elif isinstance(tree, ast.Call):
+        stringTrans += tree.func.id + "("
+        for i in range(0, len(tree.args)):
+            stringTrans += translate(tree.args[i])
+            if i != len(tree.args)-1:
+                stringTrans += ", "
+        stringTrans += ")"
+        return(stringTrans)
+
     else:
         return stringTrans
 
 
-def translateElseIf(tree):
+def translateElseIf(tree): #helper function for if translations
     stringTrans = ""
     if(not tree): #if there is not else or elif
         return stringTrans
@@ -233,17 +272,19 @@ def translateCodeBlock(tree):
     global indentationLevel
     indentationLevel += 1
     for i in tree:
-        transString += "\t"*indentationLevel + translate(i)
         if isinstance(i, ast.If) or isinstance(i, ast.For) or isinstance(i, ast.While):
-            transString += "\n"
+            transString += "\t"*indentationLevel + translate(i) + "\n"
+        elif isinstance(i, ast.FunctionDef):
+            transString += translate(i)
         else:
-            transString += ";\n"
+            transString += "\t"*indentationLevel + translate(i) + ";\n"
     indentationLevel -= 1
     return(transString)
 
 #Fetch python code and create ast
 try:
     tree = ast.parse(open(sys.argv[1]).read())
+    translatedCode = translateCodeBlock(tree.body)
     finalTranslationFileName = sys.argv[1].split("/")[len(sys.argv[1].split("/")) - 1]
     finalTranslationFileName = finalTranslationFileName.split(".")
     finalTranslationFileName[len(finalTranslationFileName) - 1] = ".cpp"
@@ -258,8 +299,9 @@ fT.write("#include <string>\n")
 fT.write("#include <math.h>\n")
 fT.write("#include <fstream>\n")
 fT.write("using namespace std;\n\n")
+fT.write(outMain)
 fT.write("int main(){\n")
-fT.write(translateCodeBlock(tree.body))
+fT.write(translatedCode)
 fT.write("\treturn 0;\n")
 fT.write("}")
 fT.close()
