@@ -8,6 +8,7 @@ import ast
 varTypeStore = {}
 #used for indentation for structures such as if, for, while, and functions
 indentationLevel = 0
+#used for tracking loop structures
 loopStructureNum = 0
 arrayCounter=0
 
