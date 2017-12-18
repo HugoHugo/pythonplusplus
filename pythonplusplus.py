@@ -1,4 +1,4 @@
-import ast
+import ast,sys
 
 #Global variables
 
@@ -57,7 +57,13 @@ def translate(tree):
     global loopStructureNum
     global arrayCounter
     global outMain
-    if isinstance(tree, ast.List):
+
+    if isinstance(tree, ast.AugAssign):
+        vIn = translate(tree.target)
+        stringTrans += vIn + " " + translate(tree.op).split(" ")[1] + "= " + translate(tree.value)
+        return stringTrans
+
+    elif isinstance(tree, ast.List):
         Ltype = getType(tree.elts[0])
         stringTrans += Ltype + " defArray" + str(arrayCounter) + "[] = {"
         arrayCounter += 1
@@ -276,11 +282,18 @@ def translateCodeBlock(tree):
     return(transString)
 
 #Fetch python code and create ast
-#TODO: Allow user to choose file
-tree = ast.parse(open("./examples/mockPyExponents.py").read())
-translatedCode = translateCodeBlock(tree.body)
+try:
+    tree = ast.parse(open(sys.argv[1]).read())
+    translatedCode = translateCodeBlock(tree.body)
+    finalTranslationFileName = sys.argv[1].split("/")[len(sys.argv[1].split("/")) - 1]
+    finalTranslationFileName = finalTranslationFileName.split(".")
+    finalTranslationFileName[len(finalTranslationFileName) - 1] = ".cpp"
+    finalTranslationFileName = "".join(finalTranslationFileName)
+except:
+    print("Error in finding the given file. Format of input: python3 pythonplusplus.py FILENAME.py")
+    sys.exit()
 
-fT = open('finTranslation.cpp', 'w')
+fT = open(finalTranslationFileName, 'w')
 fT.write("#include <iostream>\n")
 fT.write("#include <string>\n")
 fT.write("#include <math.h>\n")
